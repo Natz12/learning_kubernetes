@@ -114,3 +114,7 @@ helm ls -n airflow
 5. Check available providers:
 
 `kubectl exec <webserver_pod_id>`
+
+# References:
+
+1. [Airflow on Kubernetes : Get started in 10 mins](https://marclamberti.com/blog/airflow-on-kubernetes-get-started-in-10-mins/)
