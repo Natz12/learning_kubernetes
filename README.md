@@ -15,7 +15,7 @@ To use these instructions you will need to have docker and docker compose instal
 
   `sudo apt-get update && sudo apt-get install yamllint -y`
 
-  You can now use debug a yaml file with `yamlint &lt;filename&gt;'.
+  You can now use debug a yaml file with `yamlint <filename>`.
 
 3. Create airflow namespace `kubectl create namespace airflow`
 4. Fetch the official Helm chart of Apache Airflow that will get deployed on the cluster. We will add and update the official repository of the Apache Airflow Helm chart. Then deploy Airflow on Kubernetes with Helm install. The application will get the name airflow and the flag –debug allows us to check if anything goes wrong during the deployment:
@@ -71,7 +71,7 @@ https://airflow.apache.org/docs/helm-chart/stable/production-guide.html#webserve
 
     To get this file we execute the command:
 
-    `helm show values apache-airflow/airflow &gt; values.yaml`
+    `helm show values apache-airflow/airflow > values.yaml`
 
     We at least need to modify it to tell Airflow to use the KubernetesExecutor.
 
@@ -81,7 +81,7 @@ https://airflow.apache.org/docs/helm-chart/stable/production-guide.html#webserve
 
     `helm upgrade --install airflow apache-airflow/airflow -n airflow -f values.yaml --debug`
 
-9.  to delete cluster: `kind delete cluster --name `yamlint &lt;cluster name&gt;'
+9.  to delete cluster: `kind delete cluster --name `
 
 ## Personalize Airflow
 
@@ -113,4 +113,4 @@ helm ls -n airflow
 
 5. Check available providers:
 
-`kubectl exec &lt;webserver_pod_id&gt;`
+`kubectl exec <webserver_pod_id>`
