@@ -7,9 +7,10 @@ To use these instructions you will need to have docker and docker compose instal
 ## Instructions
 
 1. Run all the the scripts on install_kind folder. These will install kubectl, go, kind and helm.
+
 2. Execute the following command to create the kubernetes cluster:
 
-   `kind create cluster --name airflow-cluster --config /home/naty_kube/bash/kind_cluster.yaml`
+   `kind create cluster --name airflow-cluster --config <path>/cluster_config/kind_cluster.yaml`
 
 - To debug yaml file install yamllint with the following command:
 
@@ -18,6 +19,7 @@ To use these instructions you will need to have docker and docker compose instal
   You can now use debug a yaml file with `yamlint <filename>`.
 
 3. Create airflow namespace `kubectl create namespace airflow`
+
 4. Fetch the official Helm chart of Apache Airflow that will get deployed on the cluster. We will add and update the official repository of the Apache Airflow Helm chart. Then deploy Airflow on Kubernetes with Helm install. The application will get the name airflow and the flag –debug allows us to check if anything goes wrong during the deployment:
 
 ```
@@ -81,7 +83,11 @@ https://airflow.apache.org/docs/helm-chart/stable/production-guide.html#webserve
 
     `helm upgrade --install airflow apache-airflow/airflow -n airflow -f values.yaml --debug`
 
-9.  to delete cluster: `kind delete cluster --name `
+9.  to make airflow the default namespace
+
+`kubectl config set-context --current --namespace=airflow`
+
+10. to delete cluster: `kind delete cluster --name airflow-cluster`
 
 ## Personalize Airflow
 
@@ -91,7 +97,7 @@ We have instances in which we need Airflow to interact with other dependencies a
 
 1. build the image by executing the command:
 
-   `docker build -t airflow-custom:1.0.0`
+   `docker build . -t airflow-custom:1.0.0`
 
 2. Load the docker image into teh kubernetes cluster:
 
@@ -104,6 +110,18 @@ defaultAirflowRepository: airflow-custom
 defaultAirflowTag: "1.0.0"
 ```
 
+???? https://youtu.be/AjBADrVQJv0?t=1025
+
+```
+env:
+  - name: "AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY"
+    value: "hail_monitoring_goes"
+  - name: "AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG"
+    value: "latest"
+```
+
+????
+
 4. Upgrade the Helm chart
 
 ```
@@ -115,6 +133,62 @@ helm ls -n airflow
 
 `kubectl exec <webserver_pod_id>`
 
-# References:
+6. To see docker-images that are loaded
+
+   6.1 Get name of a node by running `kubectl get nodes`.
+
+   6.2 Get into the node by running `docker exec -ti <nodename> bash`
+
+   6.3 After getting into the node you can just run `crictl images` to see images loaded on that node.
+
+## Add DAGS to Docker image
+
+1. Add the following line to the Dockerfile
+
+`COPY dags $AIRFLOW_HOME/dags`
+
+AIRFLOW_HOME environment variable `airflowhome` can be found in the values.yaml file
+
+## Deploy DAGs on Kubernetes with GitSync
+
+1. we are going to need an SSH key to login into github. See the documentation to [Generate an SSH key to connect to github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+
+2. modify the values.yaml as follows:
+
+```
+gitSync:
+enabled: true
+repo: ssh://git@github.com/<github_use>/airflow-2-dags.git
+branch: main
+rev: HEAD
+root: "/git"
+dest: "repo"
+depth: 1
+subPath: ""
+sshKeySecret: airflow-ssh-git-secret
+```
+
+3. Create a secret with our private key on it. With Kubectl, the value is automatically encoded in Base64
+
+`kubectl create secret generic airflow-ssh-git-secret --from-file=gitSshKey=</Your/path/.ssh/id_rsa>`
+
+To check the secret was created:
+`kubectl get secrets`
+
+4. Upgrade Airflow in Kubernetes again:
+
+`helm upgrade --install airflow apache-airflow/airflow -n airflow -f values.yaml --debug`
+
+## Set up persistent Airflow logs
+
+1. defaultAirflowRepository
+
+## Helpful for debug
+
+`kubectl describe pods > temp.txt`
+
+`kubectl run <pod_name> --image=<image>:<tag>`
+
+## References:
 
 1. [Airflow on Kubernetes : Get started in 10 mins](https://marclamberti.com/blog/airflow-on-kubernetes-get-started-in-10-mins/)
