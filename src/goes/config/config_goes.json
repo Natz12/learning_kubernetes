@@ -1,0 +1,35 @@
+{
+    "ABI-L2-CMIPC": {
+        "name": "CMI",
+        "channels": [
+            "C01",
+            "C02",
+            "C03",
+            "C04",
+            "C05",
+            "C06",
+            "C07",
+            "C08",
+            "C09",
+            "C10",
+            "C11",
+            "C12",
+            "C13",
+            "C14",
+            "C15",
+            "C16"
+        ]
+    },
+    "ABI-L2-ACHTF": {
+        "name": "TEMP",
+        "channels": [
+            ""
+        ]
+    },
+    "ABI-L2-ACTPC": {
+        "name": "Phase",
+        "channels": [
+            ""
+        ]
+    }
+}
