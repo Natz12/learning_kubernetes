@@ -100,14 +100,13 @@ To get this file we execute the command:
 
 `helm show values apache-airflow/airflow > values.yaml`
 
-<!--
 We at least need to modify it to tell Airflow to use the KubernetesExecutor.
 
 `executor: "KubernetesExecutor"`
 
 9. Deploy Airflow in Kubernetes again:
 
-`helm upgrade --install airflow apache-airflow/airflow -n airflow -f values.yaml --debug` -->
+`helm upgrade --install airflow apache-airflow/airflow -n airflow -f values.yaml --debug`
 
 10. to delete cluster: `kind delete cluster --name airflow-cluster`
 
